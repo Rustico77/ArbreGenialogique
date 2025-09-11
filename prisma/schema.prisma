@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//------------------- Enum -----------------------
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Status {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+  DECEASED
+}
+
+
+//------------------- Model -----------------------
+model User {
+  id  String  @id @default(uuid())
+  userName  String   @unique
+  password String
+  token   String?  @unique
+  firstName   String
+  lastName    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects  Project[]
+
+  @@unique([firstName, lastName])
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  userId      String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relation
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  persons     Person[]
+  relations   Relationship[]
+}
+
+model Person {
+  id          String     @id @default(uuid())
+  projectId   String
+  firstName   String
+  lastName    String
+  image       String?
+  gender      Gender
+  birthDate   DateTime
+  birthPlace  String?
+  status      Status
+  statusDate  DateTime?
+  profession  String?
+  biography   String?
+  positionX   Float
+  positionY   Float
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parentRels  Relationship[] @relation("Parent")
+  childRels   Relationship[] @relation("Child")
+
+  @@unique([firstName, lastName, projectId])
+}
+
+model Relationship {
+  id              String        @id @default(uuid())
+  projectId       String
+  parentId        String
+  childId         String
+  relationshipType String
+  createdAt       DateTime      @default(now())
+
+  // Relations
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parent    Person  @relation("Parent", fields: [parentId], references: [id], onDelete: Cascade)
+  child     Person  @relation("Child", fields: [childId], references: [id], onDelete: Cascade)
+
+  // Contraintes uniques
+  @@unique([parentId, childId])
+}
+
