@@ -13,21 +13,24 @@ export default function Dashboard() {
   const { user, initAuth } = useAuthStore();
   const router = useRouter();
 
+  const fetchData = async (userId) => {
+      setLoading(true);
+      const projRes = await getAllProject(userId);
+      setProjects(projRes.data || []);
+      const persRes = await getAllPerson(userId);
+      setPersons(persRes.data || []);
+      setLoading(false);
+    };
+
   useEffect(() => {
       initAuth(router);
     }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const projRes = await getAllProject();
-      setProjects(projRes.data || []);
-      const persRes = await getAllPerson();
-      setPersons(persRes.data || []);
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
+    if(user){
+      fetchData(user.id);
+    }
+  }, [user]);
 
   return (
     <div className="p-6 min-h-screen">
