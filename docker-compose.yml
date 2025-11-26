@@ -4,26 +4,29 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=mysql://root:password@mysql:3306/dti
+      - DATABASE_URL=postgres://app:apppass@postgres:5432/dti
       - NEXTAUTH_URL=http://localhost:3000
       - NEXTAUTH_SECRET=your-secret-key-here-change-in-production
+      - JWT_SECRET=tester
     depends_on:
-      - mysql
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.next
+      - postgres
     restart: unless-stopped
-
-  mysql:
-    image: mysql:8.0
+    networks:
+        - arbre
+  postgres:
+    image: 'postgres:16'
+    volumes:
+        - pg_data:/var/lib/postgresql/data
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: dti
-    # Pas de ports: - le MySQL sera accessible uniquement depuis les autres containers
-    volumes:
-      - mysql_data:/var/lib/mysql
+        - POSTGRES_USER=app
+        - POSTGRES_PASSWORD=apppass
+        - POSTGRES_DB=dti
     restart: unless-stopped
+    networks:
+        - arbre
+  
+networks:
+  arbre: 
 
 volumes:
-  mysql_data:
+  pg_data:
