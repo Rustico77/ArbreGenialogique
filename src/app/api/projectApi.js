@@ -4,7 +4,7 @@ import User from './userApi';
 
 class Project {
     // GET: Récupérer tous les projets
-    static async findAll(id) {
+    static async findAllById(id) {
         try {
             const projects = await prisma.project.findMany({
                 where: { userId : id },
@@ -19,6 +19,25 @@ class Project {
                 
             });
             return { message: "", data: projects };
+        } catch (error) {
+            return { message: 'Erreur lors de la récupération des projets', data: [] };
+        }
+    };
+
+    // GET: Récupérer tous les projets
+    static async findAll() {
+        try {
+            return await prisma.project.findMany({
+                orderBy: {
+                    updatedAt: 'desc'
+                },
+                include: {
+                    _count: {
+                        select: { persons: true },
+                    },
+                },
+                
+            });
         } catch (error) {
             return { message: 'Erreur lors de la récupération des projets', data: [] };
         }

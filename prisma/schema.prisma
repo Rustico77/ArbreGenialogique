@@ -19,6 +19,11 @@ enum Gender {
   FEMALE
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 enum Status {
   SINGLE
   MARRIED
@@ -36,6 +41,8 @@ model User {
   token   String?  @unique
   firstName   String
   lastName    String
+  readOnly    Boolean  @default(false)
+  role        Role @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

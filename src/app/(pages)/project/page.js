@@ -3,14 +3,14 @@
 
 import { useState } from "react";
 import { createUser } from "../../actions/userActions";
-import { deleteProject, getAllProject, updateProject } from "../../actions/projectActions";
+import { deleteProject, getAllProjectById, updateProject } from "../../actions/projectActions";
 import CreateProjectModal from "../../modals/createProjectModal";
 import { useEffect } from 'react';
 import Loading from "../../../../components/Loading";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/app/store/authStore";
-import ConfirmDeleteModal from "@/app/modals/confirmDeleteModal";
+import ConfirmDeleteModal from "@/app/modals/confirmUserDeleteModal";
 
 
 export default function ProjectPage() {
@@ -27,7 +27,7 @@ export default function ProjectPage() {
 
   ///Functions
   const GetAllProject = async () => {
-    const res = await getAllProject(user.id);
+    const res = await getAllProjectById(user.id);
     setProjects(res.data || []);
     setLoading(false);
   };

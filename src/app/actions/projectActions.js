@@ -7,8 +7,12 @@ export async function createProject(data) {
   return await Project.create(data);
 }
 
-export async function getAllProject(id) {
-  return await Project.findAll(id);
+export async function getAllProjectById(id) {
+  return await Project.findAllById(id);
+}
+
+export async function getAllProject() {
+  return await Project.findAll();
 }
 
 export async function deleteProject(id) {

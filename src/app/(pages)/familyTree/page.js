@@ -1,6 +1,6 @@
 "use client";
 
-import { getAllProject } from "@/app/actions/projectActions";
+import { getAllProjectById } from "@/app/actions/projectActions";
 import { useAuthStore } from "@/app/store/authStore";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
@@ -172,7 +172,7 @@ export default function FamilyTree() {
   }
 
   const GetAllProject = async () => {
-      const res = await getAllProject(user.id);
+      const res = await getAllProjectById(user.id);
       setProjects(res.data);
       if(res.data.length > 0){
         setProjectSelected(res.data[0]);

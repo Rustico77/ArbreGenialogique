@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { getUserByToken } from "../actions/userActions";
+import { Role } from "@prisma/client";
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -18,7 +19,10 @@ export const useAuthStore = create((set) => ({
     localStorage.setItem("token", token);
     localStorage.setItem("expiredDate", expiredDate.toISOString());
     set({ user: userData, token, expiredDate });
-    if (router) router.push("/");
+    if (router){
+      if(userData.role === Role.ADMIN)  router.push("/admin");
+      else router.push("/");
+    }
   },
 
   // logout

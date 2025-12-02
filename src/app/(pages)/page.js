@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../store/authStore";
-import { getAllProject } from "../actions/projectActions";
+import { getAllProjectById } from "../actions/projectActions";
 import { getAllPerson } from "../actions/personActions";
 
 export default function Dashboard() {
@@ -15,7 +15,7 @@ export default function Dashboard() {
 
   const fetchData = async (userId) => {
       setLoading(true);
-      const projRes = await getAllProject(userId);
+      const projRes = await getAllProjectById(userId);
       setProjects(projRes.data || []);
       const persRes = await getAllPerson(userId);
       setPersons(persRes.data || []);

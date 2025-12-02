@@ -23,18 +23,18 @@ export default function AuthPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     const res = await loginUser({
       userName: pseudo,
       password: password,
     });
 
-    if(res.data){
+    if (res.data) {
       const expiresInMs = 60 * 60 * 1000; // 1 heure
       const expiryDate = new Date(Date.now() + expiresInMs);
       toast.success(res.message);
-      login(res.data.userName, res.data.token, expiryDate, router)
-    }else{
+      login(res.data, res.data.token, expiryDate, router);
+    } else {
       toast.error(res.message);
     }
 
@@ -44,20 +44,20 @@ export default function AuthPage() {
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     const res = await createUser({
       userName: pseudo,
       password: password,
       firstName: firstName,
-      lastName: lastName
+      lastName: lastName,
     });
 
-    if(res.data){
+    if (res.data) {
       const expiresInMs = 60 * 60 * 1000; // 1 heure
       const expiryDate = new Date(Date.now() + expiresInMs);
       toast.success(res.message);
-      login(res.data.userName, res.data.token, expiryDate, router)
-    }else{
+      login(res.data.userName, res.data.token, expiryDate, router);
+    } else {
       toast.error(res.message);
     }
 
@@ -69,58 +69,43 @@ export default function AuthPage() {
       <Card className="w-full max-w-md shadow-xl rounded-2xl">
         <CardHeader>
           <CardTitle className="flex items-center justify-center text-center text-2xl font-bold text-gray-800">
-            <Image src="/images/logo.png" alt="logo" width={50} height={50}/> Bienvenue 
+            <Image src="/images/logo.png" alt="logo" width={50} height={50} />{" "}
+            Bienvenue
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid grid-cols-2 w-full mb-6">
-              <TabsTrigger value="login">Connexion</TabsTrigger>
-              <TabsTrigger value="signup">Inscription</TabsTrigger>
-            </TabsList>
-
-            {/* Login Form */}
-            <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Pseudo</label>
-                  <Input type="name" placeholder="Pseudo" required value={pseudo} onChange={(e) => setPseudo(e.target.value)} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Mot de passe</label>
-                  <Input type="password" placeholder="********" required value={password} onChange={(e) => setPassword(e.target.value)}/>
-                </div>
-                <Button type="submit" className="w-full bg-primary hover:bg-secondary cursor-pointer text-white">
-                  {loading ? "Chargement..." : "Se connecter"}
-                </Button>
-              </form>
-            </TabsContent>
-
-            {/* Signup Form */}
-            <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Nom</label>
-                  <Input type="text" placeholder="Nom" required value={lastName} onChange={(e) => setLastName(e.target.value)}/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Prénoms</label>
-                  <Input type="text" placeholder="Prénoms" required value={firstName} onChange={(e) => setFirstName(e.target.value)}/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Pseudo</label>
-                  <Input type="name" placeholder="Pseudo" required value={pseudo} onChange={(e) => setPseudo(e.target.value)}/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Mot de passe</label>
-                  <Input type="password" placeholder="********" required value={password} onChange={(e) => setPassword(e.target.value)}/>
-                </div>
-                <Button type="submit" className="w-full bg-primary hover:bg-secondary cursor-pointer text-white">
-                  {loading ? "Chargement..." : "S'inscrire"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">
+                Pseudo
+              </label>
+              <Input
+                type="name"
+                placeholder="Pseudo"
+                required
+                value={pseudo}
+                onChange={(e) => setPseudo(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">
+                Mot de passe
+              </label>
+              <Input
+                type="password"
+                placeholder="********"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full bg-primary hover:bg-secondary cursor-pointer text-white"
+            >
+              {loading ? "Chargement..." : "Se connecter"}
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>

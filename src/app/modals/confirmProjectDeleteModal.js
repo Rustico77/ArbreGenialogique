@@ -15,7 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function ConfirmDeleteModal({ open, setOpen, _project, action }) {
+export default function ConfirmProjectDeleteModal({ open, setOpen, _project, action }) {
     const [project, setProject] = useState();
 
     useEffect(() => {

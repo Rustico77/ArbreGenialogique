@@ -2,6 +2,9 @@
 CREATE TYPE "public"."Gender" AS ENUM ('MALE', 'FEMALE');
 
 -- CreateEnum
+CREATE TYPE "public"."Role" AS ENUM ('USER', 'ADMIN');
+
+-- CreateEnum
 CREATE TYPE "public"."Status" AS ENUM ('SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED', 'DECEASED');
 
 -- CreateTable
@@ -12,6 +15,8 @@ CREATE TABLE "public"."User" (
     "token" TEXT,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
+    "readOnly" BOOLEAN NOT NULL DEFAULT false,
+    "role" "public"."Role" NOT NULL DEFAULT 'USER',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
