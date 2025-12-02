@@ -11,12 +11,19 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useAuthStore } from "@/app/store/authStore";
 import { updateUserInfo } from "@/app/actions/userActions";
 import { useRouter } from "next/navigation";
 import UpdatePasswordModal from "@/app/modals/UpdatePasswordModal";
 import { LogOut } from "lucide-react";
+import { Role } from "@prisma/client";
 
 export default function AccountPage() {
   const [form, setForm] = useState({
@@ -37,10 +44,10 @@ export default function AccountPage() {
     user.firstName = form.firstName;
 
     const res = await updateUserInfo(user.id, user);
-    if(res.data){
+    if (res.data) {
       toast.success(res.message);
       setUser(res.data);
-    }else{
+    } else {
       toast.error(res.message);
     }
 
@@ -54,8 +61,10 @@ export default function AccountPage() {
   }, []);
 
   useEffect(() => {
-    if(user){
-      setForm({firstName: user.firstName, lastName: user.lastName});
+    if (user && user.role === Role.ADMIN) {
+      setForm({ firstName: user.firstName, lastName: user.lastName });
+    } else if (user && user.role === Role.USER) {
+      logout(router);
     }
   }, [user]);
 
@@ -76,9 +85,7 @@ export default function AccountPage() {
               </label>
               <Input
                 value={form.lastName}
-                onChange={(e) =>
-                  setForm({ ...form, lastName: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                 placeholder="Votre nom"
               />
             </div>
@@ -130,7 +137,12 @@ export default function AccountPage() {
       </Card>
 
       {/* Modal changement mot de passe */}
-      <UpdatePasswordModal open={openPasswordModal} setOpen={setOpenPasswordModal} userId={user?.id} action={() => logout(router)}/>
+      <UpdatePasswordModal
+        open={openPasswordModal}
+        setOpen={setOpenPasswordModal}
+        userId={user?.id}
+        action={() => logout(router)}
+      />
     </div>
   );
 }

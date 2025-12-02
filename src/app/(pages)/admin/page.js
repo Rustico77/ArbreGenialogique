@@ -60,6 +60,8 @@ import {
   getAllPersonByProject,
   getAllPersonCount,
 } from "@/app/actions/personActions";
+import { useAuthStore } from "@/app/store/authStore";
+import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
   const [users, setUsers] = useState([]);
@@ -69,6 +71,8 @@ export default function AdminPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [currentUser, setCurrentUser] = useState();
+  const { user, logout } = useAuthStore();
+  const router = useRouter();
 
   // Stats
   const stats = {
@@ -130,8 +134,12 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
+    if (user && user.role === Role.USER) {
+      logout(router);
+    }
+
     initData();
-  }, []);
+  }, [user]);
 
   return (
     <>
