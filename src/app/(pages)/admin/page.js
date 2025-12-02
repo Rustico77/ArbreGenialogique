@@ -50,15 +50,21 @@ import {
   BookDashed,
   BookHeadphones,
 } from "lucide-react";
-import { getAllUser } from "@/app/actions/userActions";
+import { getAllUser, updateUserInfo } from "@/app/actions/userActions";
 import { Role } from "@prisma/client";
 import { getAllProject } from "@/app/actions/projectActions";
 import CreateUserModal from "@/app/modals/createUserModal";
 import ConfirmUserDeleteModal from "@/app/modals/confirmUserDeleteModal";
+import { toast } from "sonner";
+import {
+  getAllPersonByProject,
+  getAllPersonCount,
+} from "@/app/actions/personActions";
 
 export default function AdminPage() {
   const [users, setUsers] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [personCount, setPersonCount] = useState(0);
   const [loadingData, setLoadingData] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -74,45 +80,30 @@ export default function AdminPage() {
       ? "..."
       : users.filter((user) => user.role === Role.USER).length.toString(),
     totalProjects: loadingData ? "..." : projects.length || "0",
-    totalPersons: loadingData
-      ? "..."
-      : projects.reduce((sum, project) => {
-          sum + (project._count?.persons || 0);
-        }, 0),
+    totalPersons: loadingData ? "..." : personCount,
     readOnlyUsers: loadingData
       ? "..."
       : users.filter((user) => user.readOnly).length.toString(),
   };
 
-  // Créer un utilisateur (simulation)
-  const handleCreateUser = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const newUser = {
-      id: String(Date.now()),
-      userName: formData.get("userName"),
-      firstName: formData.get("firstName"),
-      lastName: formData.get("lastName"),
-      role: formData.get("role") || "USER",
-      readOnly: formData.get("readOnly") === "on",
-      projectsCount: 0,
-    };
-
-    setUsers([newUser, ...users]);
-    setIsDialogOpen(false);
-  };
-
   // Toggle lecture seule
-  const toggleReadOnly = (id) => {
-    setUsers(
-      users.map((u) => (u.id === id ? { ...u, readOnly: !u.readOnly } : u))
-    );
-  };
-
-  // Supprimer un utilisateur (simulation)
-  const deleteUser = (id) => {
-    if (confirm("Supprimer cet utilisateur ?")) {
-      setUsers(users.filter((u) => u.id !== id));
+  const toggleReadOnly = async (user) => {
+    user.readOnly = !user.readOnly;
+    const id = user.id;
+    const res = await updateUserInfo(id, {
+      readOnly: user.readOnly,
+      userName: user.userName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    });
+    if (!res.data) {
+      toast.error(res.message);
+    } else {
+      setUsers(
+        users.map((u) => (u.id === id ? { ...u, readOnly: user.readOnly } : u))
+      );
+      toast.success(res.message);
     }
   };
 
@@ -130,6 +121,10 @@ export default function AdminPage() {
     // projects
     const projectsData = await getAllProject();
     setProjects(projectsData);
+
+    // persons Count
+    const count = await getAllPersonCount();
+    setPersonCount(count);
 
     setLoadingData(false);
   };
@@ -232,12 +227,15 @@ export default function AdminPage() {
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
+                  {/* User name */}
                   <TableCell className="font-medium">
-                    {user.firstName} {user.lastName}
+                    {user.lastName} {user.firstName}
                     <p className="text-sm text-muted-foreground">
                       @{user.userName}
                     </p>
                   </TableCell>
+
+                  {/* Role */}
                   <TableCell>
                     <Badge
                       className={
@@ -247,19 +245,34 @@ export default function AdminPage() {
                       {user.role === "ADMIN" ? "Admin" : "Utilisateur"}
                     </Badge>
                   </TableCell>
+
+                  {/* ReadOnly */}
+                  {user.role === Role.ADMIN ? (
+                    <TableCell>-</TableCell>
+                  ) : (
+                    <TableCell>
+                      <Switch
+                        checked={user.readOnly}
+                        className="cursor-pointer"
+                        onCheckedChange={() => toggleReadOnly(user)}
+                      />
+                    </TableCell>
+                  )}
+
+                  {/* Nombre projet */}
                   <TableCell>
-                    <Switch
-                      checked={user.readOnly}
-                      onCheckedChange={() => toggleReadOnly(user.id)}
-                    />
+                    {user.role === Role.ADMIN ? "-" : user._count.projects}
                   </TableCell>
-                  <TableCell>{user.projectsCount}</TableCell>
+
+                  {/* Actions */}
                   <TableCell className="text-right space-x-2">
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 cursor-pointer"
-                      onClick={() => {setIsDialogOpen(true), setCurrentUser(user)}}
+                      onClick={() => {
+                        setIsDialogOpen(true), setCurrentUser(user);
+                      }}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>

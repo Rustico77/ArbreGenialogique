@@ -11,19 +11,12 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useAuthStore } from "@/app/store/authStore";
 import { updateUserInfo } from "@/app/actions/userActions";
 import { useRouter } from "next/navigation";
 import UpdatePasswordModal from "@/app/modals/UpdatePasswordModal";
 import { LogOut } from "lucide-react";
-import { Role } from "@prisma/client";
 
 export default function AccountPage() {
   const [form, setForm] = useState({
@@ -44,10 +37,10 @@ export default function AccountPage() {
     user.firstName = form.firstName;
 
     const res = await updateUserInfo(user.id, user);
-    if (res.data) {
+    if(res.data){
       toast.success(res.message);
       setUser(res.data);
-    } else {
+    }else{
       toast.error(res.message);
     }
 
@@ -56,42 +49,18 @@ export default function AccountPage() {
     }, 1500);
   };
 
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setOpenPasswordModal(false);
-      alert("Mot de passe modifié ✅");
-    }, 1500);
-  };
-
   useEffect(() => {
     initAuth(router);
   }, []);
 
   useEffect(() => {
-    if (user && user.role === Role.USER) {
-      setForm({ firstName: user.firstName, lastName: user.lastName });
-    } else if (user && user.role === Role.ADMIN) {
-      logout(router);
+    if(user){
+      setForm({firstName: user.firstName, lastName: user.lastName});
     }
   }, [user]);
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-8">
-      {/* Titre */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Mon compte</h1>
-        <Button
-          onClick={() => logout(router)}
-          type="button"
-          className="mb-10 bg-red-900 hover:bg-red-700 text-white mt-10 cursor-pointer"
-        >
-          Se déconnecter
-        </Button>
-      </div>
-
+    <div className="max-w-2xl mx-auto px-6 py-0 space-y-8">
       {/* Informations personnelles */}
       <Card className="shadow-lg border rounded-2xl">
         <CardHeader>
@@ -107,7 +76,9 @@ export default function AccountPage() {
               </label>
               <Input
                 value={form.lastName}
-                onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, lastName: e.target.value })
+                }
                 placeholder="Votre nom"
               />
             </div>
@@ -159,12 +130,7 @@ export default function AccountPage() {
       </Card>
 
       {/* Modal changement mot de passe */}
-      <UpdatePasswordModal
-        open={openPasswordModal}
-        setOpen={setOpenPasswordModal}
-        userId={user?.id}
-        action={() => logout(router)}
-      />
+      <UpdatePasswordModal open={openPasswordModal} setOpen={setOpenPasswordModal} userId={user?.id} action={() => logout(router)}/>
     </div>
   );
 }

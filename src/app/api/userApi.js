@@ -143,6 +143,9 @@ class User {
   static async findAll() {
     try {
       return await prisma.user.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
         select: {
           id: true,
           userName: true,
@@ -152,12 +155,10 @@ class User {
           readOnly: true,
           createdAt: true,
           updatedAt: true,
+          _count: {
+            select: { projects: true },
+          },
         },
-        // include: {
-        //   _count: {
-        //     select: { projects: true },
-        //   },
-        // },
       });
     } catch (error) {
       throw new Error("Failed to fetch users");
@@ -186,9 +187,18 @@ class User {
         data.lastName
       );
 
+      const userByUserName = await this.findByUserName(data.userName);
+
       if (user && user.id !== id) {
         return {
           message: "Le nom et prénoms de ce utilisateur existe déjà !",
+          data: null,
+        };
+      }
+
+      if (userByUserName && userByUserName.id !== id) {
+        return {
+          message: "Ce nom d'utilisateur existe déjà !",
           data: null,
         };
       }
@@ -200,7 +210,7 @@ class User {
 
       return { message: "Modification effectuée avec succès.", data: res };
     } catch (error) {
-      return { message: "Modification échoué.", data: null };
+      return { message: `Modification échoué. ${error}`, data: null };
     }
   }
 

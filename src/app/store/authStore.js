@@ -21,7 +21,7 @@ export const useAuthStore = create((set) => ({
     set({ user: userData, token, expiredDate });
     if (router){
       if(userData.role === Role.ADMIN)  router.push("/admin");
-      else router.push("/");
+      else router.push("/familyTree");
     }
   },
 

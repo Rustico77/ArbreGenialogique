@@ -99,8 +99,6 @@ const Navbar = () => {
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            <DropdownMenuLabel className="font-medium"></DropdownMenuLabel>
           </div>
 
           {/* Button Menu Mobile */}
@@ -120,14 +118,18 @@ const Navbar = () => {
             <div className="flex flex-col space-y-3 px-6 py-4">
               {links.map((link) => (
                 <Link
+                  onClick={() => link.name === "Deconnexion" && logout()}
                   key={link.name}
                   href={link.href}
                   className={`text-[15px] font-medium ${
                     pathname === link.href
-                      ? "text-[#002A67] border-b-2 border-[#002A67]-500 pb-1"
+                      ? "text-[#002A67] border-b-2 border-[#002A67] pb-1"
                       : "text-gray-600 hover:text-gray-900"
+                  } ${
+                    link.name === "Deconnexion"
+                      ? "cursor-pointer text-red-700 font-semibold flex justify-center mt-5 border-1 p-1 border-red-400 rounded-2xl bg-red-200"
+                      : ""
                   }`}
-                  onClick={() => setIsOpen(false)} // ferme le menu au clic
                 >
                   {link.name !== "Compte" ? (
                     link.name
@@ -139,11 +141,7 @@ const Navbar = () => {
                         height={30}
                         width={30}
                       />
-                      <h2>
-                        {user != null
-                          ? `${user.lastName} ${user.firstName}`
-                          : ""}
-                      </h2>
+                      <h2>Profil</h2>
                     </div>
                   )}
                 </Link>

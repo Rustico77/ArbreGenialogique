@@ -8,8 +8,12 @@ export async function createPerson(data) {
   return await Person.create(data);
 }
 
-export async function getAllPerson(projectId) {
-  return await Person.findAll(projectId);
+export async function getAllPersonByProject(projectId) {
+  return await Person.findAllByProject(projectId);
+}
+
+export async function getAllPersonCount() {
+  return await Person.AllPersonCount();
 }
 
 export async function getSinglePerson(id) {

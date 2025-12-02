@@ -4,21 +4,24 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../store/authStore";
 import { getAllProjectById } from "../actions/projectActions";
-import { getAllPerson } from "../actions/personActions";
+import { getAllPersonByProject } from "../actions/personActions";
+import { Role } from "@prisma/client";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState([]);
-  const [persons, setPersons] = useState([]);
+  const [personsCount, setPersonsCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { user, initAuth } = useAuthStore();
+  const { user, initAuth, logout } = useAuthStore();
   const router = useRouter();
 
   const fetchData = async (userId) => {
       setLoading(true);
       const projRes = await getAllProjectById(userId);
       setProjects(projRes.data || []);
-      const persRes = await getAllPerson(userId);
-      setPersons(persRes.data || []);
+      setPersonsCount(projRes.data.reduce((acc, proj) => {
+        const count = proj._count.persons || 0;
+        return acc + count;
+      }, 0));
       setLoading(false);
     };
 
@@ -27,8 +30,10 @@ export default function Dashboard() {
     }, []);
 
   useEffect(() => {
-    if(user){
-      fetchData(user.id);
+    if(user && user.role === Role.USER){
+      fetchData(user.id); 
+    }else if(user && user.role === Role.ADMIN){
+      logout(router);
     }
   }, [user]);
 
@@ -46,7 +51,7 @@ export default function Dashboard() {
 
         {/* Personnes créées */}
         <div onClick={() => router.push("/familyTree")} className="bg-white shadow rounded-lg p-6 flex flex-col items-center justify-center hover:shadow-lg transition cursor-pointer">
-          <div className="text-3xl font-bold text-green-600">{persons.length}</div>
+          <div className="text-3xl font-bold text-green-600">{personsCount}</div>
           <div className="text-gray-500 mt-2">Personnes créées</div>
         </div>
       </div>

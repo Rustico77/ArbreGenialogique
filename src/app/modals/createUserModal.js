@@ -27,18 +27,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { createUser } from "../actions/userActions";
+import { createUser, updateUserInfo } from "../actions/userActions";
 
 export default function CreateUserModal({ open, setOpen, action, user, setUser }) {
   ///Const
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState();
+  const [form, setForm] = useState({
+      firstName: "",
+      lastName: "",
+      userName: "",
+      role: "USER",
+      readOnly: false,
+  });
 
   ///Functions
   const initForm = () => {
     setOpen(false);
     setForm({
-      firstName: "dqslk",
+      firstName: "",
       lastName: "",
       userName: "",
       role: "USER",
@@ -76,15 +82,15 @@ export default function CreateUserModal({ open, setOpen, action, user, setUser }
     }
     ///Update
     else {
-      //   const res = await updateProject(project.id, form);
-      //   setLoading(false);
-      //   if (!res.isSuccess) {
-      //     toast.error(res.message);
-      //   } else {
-      //     toast.success(res.message);
-      //     initForm();
-      //     action();
-      //   }
+        const res = await updateUserInfo(user.id, form);
+        setLoading(false);
+        if (!res.data) {
+          toast.error(res.message);
+        } else {
+          toast.success(res.message);
+          initForm();
+          action();
+        }
     }
   };
 

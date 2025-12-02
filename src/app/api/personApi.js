@@ -4,8 +4,8 @@ import User from './userApi';
 
 
 class Person {
-    // GET: Récupérer toutes les personnes
-    static async findAll(projectId) {
+    // GET: Récupérer toutes les personnes par projet
+    static async findAllByProject(projectId) {
         try {
             const persons = await prisma.person.findMany({
                 where: { projectId },
@@ -13,6 +13,15 @@ class Person {
             return { message: "", data: persons };
         } catch (error) {
             return { message: 'Erreur lors de la récupération des projets', data: [] };
+        }
+    };
+
+    // GET: Récupérer toutes les personnes
+    static async AllPersonCount() {
+        try {
+            return await prisma.person.count();
+        } catch (error) {
+            return 0;
         }
     };
 
